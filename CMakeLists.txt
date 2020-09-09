@@ -38,6 +38,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Utils.cmake)
 
 include(CMakeDependentOption)
 #Some things have order. This must be put in front alone
+option(MXNET_FAASM "Build MXNet for Faasm" ON)
 option(MXNET_BUILD_SHARED_LIBS "Build shared libraries instead of static libraries" ON)
 option(USE_CUDA "Build with CUDA support"   ON)
 set(MXNET_CUDA_ARCH "Auto" CACHE STRING "Target NVIDIA GPU achitecture.
@@ -461,6 +462,9 @@ if(USE_JEMALLOC)
   endif()
 endif()
 
+# Exclude googletest if building for Faasm
+if(MXNET_FAASM)
+else()
 include(CTest)
 set(GTEST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/googletest/googletest")
 set(GTEST_INCLUDE_DIR ${GTEST_ROOT}/include)
@@ -471,6 +475,7 @@ add_subdirectory(${GTEST_ROOT})
 set_target_properties(gtest PROPERTIES CXX_CLANG_TIDY "")  # don't lint 3rdparty dependency
 set_target_properties(gtest_main PROPERTIES CXX_CLANG_TIDY "")  # don't lint 3rdparty dependency
 find_package(GTest REQUIRED)
+endif()
 
 # cudnn detection
 if(USE_CUDNN)
@@ -632,7 +637,7 @@ endif()
 # Add cmake targets
 add_subdirectory("3rdparty/mshadow")
 
-if(UNIX)
+if(UNIX OR MXNET_FAASM)
   string(APPEND CMAKE_CUDA_FLAGS " ${CUDA_ARCH_FLAGS_SPACES}")
   # Create dummy file since we want an empty shared library before linking
   set(DUMMY_SOURCE ${CMAKE_BINARY_DIR}/dummy.c)

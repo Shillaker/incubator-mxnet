@@ -31,7 +31,18 @@ else()
   endif()
 endif()
 
-if(BLAS STREQUAL "Atlas" OR BLAS STREQUAL "atlas")
+if(MXNET_FAASM)
+  # Hard-code the Faasm blas stuff
+  include_directories(SYSTEM ${CMAKE_SYSROOT}/include/clapack)
+
+  list(APPEND mshadow_LINKER_LIBS lapack blas cblas f2c)
+
+  add_definitions(-DMSHADOW_USE_MKL=0)
+  add_definitions(-DMSHADOW_USE_CBLAS=1)
+
+  # Need to specify MXNet BLAS here?
+
+elseif(BLAS STREQUAL "Atlas" OR BLAS STREQUAL "atlas")
   find_package(Atlas REQUIRED)
   include_directories(SYSTEM ${Atlas_INCLUDE_DIR})
   list(APPEND mshadow_LINKER_LIBS ${Atlas_LIBRARIES})
