@@ -35,7 +35,12 @@ if(MXNET_FAASM)
   # Hard-code the Faasm blas stuff
   include_directories(SYSTEM ${CMAKE_SYSROOT}/include/clapack)
 
-  list(APPEND mshadow_LINKER_LIBS lapack blas cblas f2c)
+  list(APPEND mshadow_LINKER_LIBS 
+      ${CMAKE_SYSROOT}/lib/wasm32-wasi/liblapack.so 
+      ${CMAKE_SYSROOT}/lib/wasm32-wasi/libblas.so
+      ${CMAKE_SYSROOT}/lib/wasm32-wasi/libcblas.so
+      ${CMAKE_SYSROOT}/lib/wasm32-wasi/libf2c.so
+      )
 
   add_definitions(-DMSHADOW_USE_MKL=0)
   add_definitions(-DMSHADOW_USE_CBLAS=1)

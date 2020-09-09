@@ -203,6 +203,10 @@ else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
   endif()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS}")
+
+  if(MXNET_FAASM)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xlinker --no-entry")
+  endif()
 endif()
 
 if(NOT mxnet_LINKER_LIBS)
