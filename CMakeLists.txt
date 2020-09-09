@@ -162,6 +162,15 @@ if("$ENV{VERBOSE}" STREQUAL "1")
   set(CMAKE_VERBOSE_MAKEFILE ON)
 endif()
 
+# Some changes to help with DMLC
+if(MXNET_FAASM)
+  # Disable fopen64 in Faasm
+  add_definitions(-DDMLC_USE_FOPEN64=0)
+
+  # Helps DMLC pick a semaphore implementation
+  add_definitions(-D__unix__=1)
+endif()
+
 #Switch off modern thread local for dmlc-core, please see: https://github.com/dmlc/dmlc-core/issues/571#issuecomment-543467484
 add_definitions(-DDMLC_MODERN_THREAD_LOCAL=0)
 # disable stack trace in exception by default.
