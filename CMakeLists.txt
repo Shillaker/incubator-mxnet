@@ -167,8 +167,9 @@ if(MXNET_FAASM)
   # Disable fopen64 in Faasm
   add_definitions(-DDMLC_USE_FOPEN64=0)
 
-  # Helps DMLC pick a semaphore implementation
-  add_definitions(-D__unix__=1)
+  # Disable mshadow CUDA
+  add_definitions(-DMSHADOW_USE_CUDA=0)
+
 endif()
 
 #Switch off modern thread local for dmlc-core, please see: https://github.com/dmlc/dmlc-core/issues/571#issuecomment-543467484
@@ -205,7 +206,10 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS}")
 
   if(MXNET_FAASM)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xlinker --no-entry")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
+        -Xlinker --no-entry \
+        -Xlinker --no-gc-sections
+        ")
   endif()
 endif()
 
