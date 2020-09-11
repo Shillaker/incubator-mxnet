@@ -200,17 +200,10 @@ else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -g")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_ASSERTIONS")
   else()
-    add_definitions(-DNDEBUG=1)
+    add_definitions("-DNDEBUG=1")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
   endif()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS}")
-
-  if(MXNET_FAASM)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-        -Xlinker --no-entry \
-        -Xlinker --no-gc-sections
-        ")
-  endif()
 endif()
 
 if(NOT mxnet_LINKER_LIBS)
@@ -744,22 +737,30 @@ elseif(MSVC)
 endif()
 target_compile_definitions(mxnet PUBLIC DMLC_LOG_FATAL_THROW=$<BOOL:${LOG_FATAL_THROW}>)
 
+if(MXNET_BUILD_SHARED_LIBS)
+   set(CUSTOM_OP_LIB_TYPE SHARED)
+else()
+   set(CUSTOM_OP_LIB_TYPE STATIC)
+endif()
+
 # extension libraries (custom operators, custom subgraphs) are built by default
-add_library(customop_lib SHARED ${CMAKE_CURRENT_SOURCE_DIR}/example/extensions/lib_custom_op/gemm_lib.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/lib_api.cc)
-add_library(transposecsr_lib SHARED ${CMAKE_CURRENT_SOURCE_DIR}/example/extensions/lib_custom_op/transposecsr_lib.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/lib_api.cc)
-add_library(transposerowsp_lib SHARED ${CMAKE_CURRENT_SOURCE_DIR}/example/extensions/lib_custom_op/transposerowsp_lib.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/lib_api.cc)
-add_library(subgraph_lib SHARED ${CMAKE_CURRENT_SOURCE_DIR}/example/extensions/lib_subgraph/subgraph_lib.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/lib_api.cc)
-add_library(pass_lib SHARED ${CMAKE_CURRENT_SOURCE_DIR}/example/extensions/lib_pass/pass_lib.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/lib_api.cc)
+add_library(customop_lib ${CUSTOM_OP_LIB_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/example/extensions/lib_custom_op/gemm_lib.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/lib_api.cc)
+add_library(transposecsr_lib ${CUSTOM_OP_LIB_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/example/extensions/lib_custom_op/transposecsr_lib.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/lib_api.cc)
+add_library(transposerowsp_lib ${CUSTOM_OP_LIB_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/example/extensions/lib_custom_op/transposerowsp_lib.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/lib_api.cc)
+add_library(subgraph_lib ${CUSTOM_OP_LIB_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/example/extensions/lib_subgraph/subgraph_lib.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/lib_api.cc)
+add_library(pass_lib ${CUSTOM_OP_LIB_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/example/extensions/lib_pass/pass_lib.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/lib_api.cc)
 
 target_include_directories(customop_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/mxnet)
 target_include_directories(transposecsr_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/mxnet)
 target_include_directories(transposerowsp_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/mxnet)
 target_include_directories(subgraph_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/mxnet)
 target_include_directories(pass_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/mxnet)
+
 if(USE_CUDA)
   add_library(customop_gpu_lib SHARED ${CMAKE_CURRENT_SOURCE_DIR}/example/extensions/lib_custom_op/relu_lib.cu ${CMAKE_CURRENT_SOURCE_DIR}/example/extensions/lib_custom_op/relu_lib.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/lib_api.cc)
   target_include_directories(customop_gpu_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/mxnet ${CMAKE_CURRENT_SOURCE_DIR}/example/extensions/lib_custom_op)
 endif()
+
 if(UNIX)
   if (USE_CUDA)
     target_compile_options(customop_gpu_lib PUBLIC -shared)
