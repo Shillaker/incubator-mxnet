@@ -36,10 +36,10 @@ if(MXNET_FAASM)
   include_directories(SYSTEM ${CMAKE_SYSROOT}/include/clapack)
 
   list(APPEND mshadow_LINKER_LIBS 
-      ${CMAKE_SYSROOT}/lib/wasm32-wasi/liblapack.so 
-      ${CMAKE_SYSROOT}/lib/wasm32-wasi/libblas.so
-      ${CMAKE_SYSROOT}/lib/wasm32-wasi/libcblas.so
-      ${CMAKE_SYSROOT}/lib/wasm32-wasi/libf2c.so
+      ${CMAKE_SYSROOT}/lib/wasm32-wasi/liblapack.a
+      ${CMAKE_SYSROOT}/lib/wasm32-wasi/libblas.a
+      ${CMAKE_SYSROOT}/lib/wasm32-wasi/libcblas.a
+      ${CMAKE_SYSROOT}/lib/wasm32-wasi/libf2c.a
       )
 
   add_definitions(-DMSHADOW_USE_MKL=0)
