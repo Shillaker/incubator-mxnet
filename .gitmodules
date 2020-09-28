@@ -1,6 +1,6 @@
 [submodule "3rdparty/dmlc-core"]
 	path = 3rdparty/dmlc-core
-    url = https://github.com/Shillaker/dmlc-core
+    url = https://github.com/faasm/dmlc-core
     branch = faasm
 [submodule "3rdparty/ps-lite"]
 	path = 3rdparty/ps-lite
