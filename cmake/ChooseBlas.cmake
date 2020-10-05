@@ -32,20 +32,22 @@ else()
 endif()
 
 if(MXNET_FAASM)
-  # Hard-code the Faasm blas stuff
   include_directories(SYSTEM ${CMAKE_SYSROOT}/include/clapack)
 
+  if(MXNET_BUILD_SHARED_LIBS)
+      set(LIB_EXT ".so")
+  else()
+      set(LIB_EXT ".a")
+  endif()
+  
   list(APPEND mshadow_LINKER_LIBS 
-      ${CMAKE_SYSROOT}/lib/wasm32-wasi/liblapack.a
-      ${CMAKE_SYSROOT}/lib/wasm32-wasi/libblas.a
-      ${CMAKE_SYSROOT}/lib/wasm32-wasi/libcblas.a
-      ${CMAKE_SYSROOT}/lib/wasm32-wasi/libf2c.a
-      )
+      ${CMAKE_SYSROOT}/lib/wasm32-wasi/liblapack${LIB_EXT}
+      ${CMAKE_SYSROOT}/lib/wasm32-wasi/libblas${LIB_EXT}
+      ${CMAKE_SYSROOT}/lib/wasm32-wasi/libf2c${LIB_EXT}
+  )
 
   add_definitions(-DMSHADOW_USE_MKL=0)
   add_definitions(-DMSHADOW_USE_CBLAS=1)
-
-  # Need to specify MXNet BLAS here?
 
 elseif(BLAS STREQUAL "Atlas" OR BLAS STREQUAL "atlas")
   find_package(Atlas REQUIRED)
