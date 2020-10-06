@@ -658,7 +658,13 @@ if(UNIX OR MXNET_FAASM)
     add_library(mxnet STATIC ${SOURCE})
   endif()
   target_link_libraries(mxnet PUBLIC mshadow)
-  target_link_libraries(mxnet PUBLIC ${CMAKE_DL_LIBS})
+
+  if(MXNET_FAASM)
+      # Faasm handles its own DL
+  else()
+    target_link_libraries(mxnet PUBLIC ${CMAKE_DL_LIBS})
+  endif()
+
   if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     target_compile_options(mxnet PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-Werror>")
     # Ignore erroneous compiler warnings:
